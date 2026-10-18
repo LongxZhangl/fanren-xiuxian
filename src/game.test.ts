@@ -14,3 +14,8 @@ describe('存档', () => {
   it('读取存档结算离线奖励并保留累计资源', () => { const result = restore(JSON.stringify({ ...initialGame(0), stones: 20 }), 10000); expect(result.seconds).toBe(10); expect(result.stones).toBe(5); expect(result.game.stones).toBe(25); });
   it.each(['null', '{}', '{', JSON.stringify({ ...initialGame(), realm: 99 }), JSON.stringify({ ...initialGame(), stones: -1 }), JSON.stringify({ ...initialGame(), technique: 0 }), JSON.stringify({ ...initialGame(), cultivation: 999 }), JSON.stringify({ ...initialGame(), logs: [12] }), JSON.stringify({ ...initialGame(), updatedAt: Date.now() + 120000 })])('拒绝损坏或非法存档 %s', raw => { expect(() => parseSave(raw)).toThrow(); });
 });
+
+describe('v0.3 存档迁移', () => {
+  it('旧版存档自动补齐性别、动作和音乐默认值', () => { const legacy = JSON.stringify({ ...initialGame(0), gender: undefined, action: undefined, music: undefined }); const g = JSON.parse(legacy); delete g.gender; delete g.action; delete g.music; const restored = parseSave(JSON.stringify(g)); expect(restored.gender).toBe('male'); expect(restored.action).toBe('idle'); expect(restored.music).toEqual({ playing: false, volume: 0.45, muted: false, track: 0, loop: true }); });
+  it('性别、动作和音乐设置可持久化', () => { const g = { ...initialGame(), gender: 'female' as const, action: 'cultivating' as const, music: { playing: true, volume: 0.7, muted: true, track: 2, loop: false } }; expect(parseSave(JSON.stringify(g))).toMatchObject(g); });
+});
