@@ -61,7 +61,6 @@ function App() {
   }
   const progress = Math.min(100, game.cultivation / requirement(game) * 100);
   return <div className="app"><header><a className="brand" href="#">凡人<span>问道</span><small>一念入仙途</small></a><div className="account"><span className="save-status"><i/> {user ? `云端：${user.email}` : saving ? '本地自动存档' : '存档保护中'}</span>{user ? <button onClick={async () => { await uploadCloud(); await signOut(); setUser(null); setMessage('已退出登录，游客存档仍保留。'); }}>退出</button> : <button onClick={() => setAuthMode('login')}>邮箱登录</button>}</div></header>
-    <section className="landscape" aria-label="水墨山峦"><div className="moon"/><div className="mountain far"/><div className="mountain near"/><div className="hero-copy"><span className="eyebrow">山中无甲子 · 修行不知年</span><h1>凡心不灭，<br/>大道可期。</h1><p>且听松风，静候一场破境。</p></div><span className="seal">问<br/>道</span><div className="landscape-foot"><span>青云山 · 无名洞府</span><span>✦ 灵气充盈</span></div></section>
     <section className={`cultivation-stage action-${meditationAction} gender-${gender}`} aria-label="人物打坐修行">
       <div className="stage-heading"><span>云深不知处</span><span className="stage-status"><i/>灵气流转</span></div>
       <div className="stage-scene">
