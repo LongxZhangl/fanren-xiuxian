@@ -92,14 +92,14 @@ function App() {
             <path d="M198 270 Q216 260 229 271 Q235 278 224 284 Q210 290 189 281Z" fill="url(#skin)" stroke="#d8b9a1" strokeWidth="1.5"/>
             <path d="M143 83 Q143 67 160 67 Q177 67 177 83 L177 118 Q171 132 160 132 Q149 132 143 118Z" fill="url(#skin)"/>
             <path d="M138 85 Q130 47 158 42 Q190 44 183 87 L176 102 L174 75 Q160 83 143 72 L142 100Z" fill={gender === 'male' ? '#172220' : '#172522'}/>
-            {#if gender === 'female'}
+            {gender === 'female' ? <>
               <path d="M140 62 Q126 69 132 115 L142 135 L150 118 L145 85Z M178 62 Q194 75 188 119 L177 137 L170 117 L178 84Z" fill="#1a2824"/>
               <path d="M151 43 Q160 32 170 43 L175 55 L145 55Z" fill="#b9a879" stroke="#e0d3a6" strokeWidth="2"/>
-            {:else}
+            </> : <>
               <path d="M145 48 Q160 36 175 48 L179 66 Q160 60 141 66Z" fill="#1b2724"/>
               <path d="M160 41 L160 20 Q164 16 168 21 L168 43" fill="#1a2824"/>
               <path d="M166 23 L166 48" stroke="#c6b580" strokeWidth="2"/>
-            {/if}
+            </>}
             <path d="M150 90 Q160 95 170 90" fill="none" stroke="#9d7464" strokeWidth="1.4" opacity=".7"/>
             <path d="M152 105 Q160 109 168 105" fill="none" stroke="#9a6658" strokeWidth="1.5" strokeLinecap="round"/>
             <path d="M145 82 Q151 78 156 82 M164 82 Q169 78 175 82" fill="none" stroke="#403a32" strokeWidth="2" strokeLinecap="round"/>
