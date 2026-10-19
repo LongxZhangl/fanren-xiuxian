@@ -4,7 +4,34 @@ export { supabaseConfigured } from './config';
 export type AuthResult = { ok: true; user?: User; session?: Session | null } | { ok: false; message: string };
 export const supabase: SupabaseClient | null = supabaseConfigured ? createClient(supabaseConfig.url!, supabaseConfig.key!, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 export const authError = (error: unknown) => { const message = error instanceof Error ? error.message : ''; if (/invalid login credentials/i.test(message)) return '邮箱或密码不正确。'; if (/email not confirmed/i.test(message)) return '邮箱尚未确认，请先查看确认邮件。'; if (/already registered|user already registered/i.test(message)) return '该邮箱已注册，请直接登录。'; if (/password/i.test(message)) return '密码不符合 Supabase 的安全要求。'; if (/rate limit|too many/i.test(message)) return '请求过于频繁，请稍后再试。'; return '操作失败，请检查网络或 Supabase 配置后重试。'; };
-export async function signUp(email: string, password: string): Promise<AuthResult> { if (!supabase) return { ok: false, message: '云端登录尚未配置，游客模式仍可正常游玩。' }; const { data, error } = await supabase.auth.signUp({ email, password }); return error ? { ok: false, message: authError(error) } : { ok: true, user: data.user ?? undefined, session: data.session }; }
+export async function signUp(
+  email: string,
+  password: string,
+): Promise<AuthResult> {
+  if (!supabase) {
+    return {
+      ok: false,
+      message: '云端登录尚未配置，游客模式仍可正常游玩。',
+    };
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
+    },
+  });
+
+  return error
+    ? { ok: false, message: authError(error) }
+    : {
+        ok: true,
+        user: data.user ?? undefined,
+        session: data.session,
+      };
+}
+
 export async function signIn(email: string, password: string): Promise<AuthResult> { if (!supabase) return { ok: false, message: '云端登录尚未配置，游客模式仍可正常游玩。' }; const { data, error } = await supabase.auth.signInWithPassword({ email, password }); return error ? { ok: false, message: authError(error) } : { ok: true, user: data.user ?? undefined, session: data.session }; }
 export async function requestPasswordReset(email: string): Promise<AuthResult> { if (!supabase) return { ok: false, message: '云端登录尚未配置，游客模式仍可正常游玩。' }; const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}` }); return error ? { ok: false, message: authError(error) } : { ok: true }; }
 export async function updatePassword(password: string): Promise<AuthResult> { if (!supabase) return { ok: false, message: '云端登录尚未配置，游客模式仍可正常游玩。' }; const { data, error } = await supabase.auth.updateUser({ password }); return error ? { ok: false, message: authError(error) } : { ok: true, user: data.user }; }
