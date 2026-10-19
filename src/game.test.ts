@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { advance, breakthrough, cultivationRate, initialGame, MAX_OFFLINE, parseSave, realmName, requirement, restore, upgrade, upgradeCost } from './game';
 describe('修行与资源', () => {
-  it('初始为炼气一层，按秒产出修为和灵石', () => { const g = advance(initialGame(1000), 11000); expect(realmName(g)).toBe('炼气一层'); expect(g.cultivation).toBe(10); expect(g.stones).toBe(5); });
-  it('离线最多八小时，修为不超过突破门槛', () => { const g = advance(initialGame(0), 24 * 3600 * 1000); expect(g.stones).toBe(MAX_OFFLINE * 0.5); expect(g.cultivation).toBe(requirement(g)); });
+  it('初始为炼气一层，按秒产出修为和灵石', () => { const g = advance(initialGame(1000), 11000); expect(realmName(g)).toBe('炼气一层'); expect(g.cultivation).toBe(10); expect(g.stones).toBe(0.2); });
+  it('离线最多八小时，修为不超过突破门槛', () => { const g = advance(initialGame(0), 24 * 3600 * 1000); expect(g.stones).toBe(MAX_OFFLINE * 0.02); expect(g.cultivation).toBe(requirement(g)); });
   it('时钟倒退不发奖励，不回退结算时间', () => { const g = initialGame(10000); expect(advance(g, 0)).toEqual(g); });
   it('重复结算不重复产生收益', () => { const g = advance(initialGame(0), 10000); expect(advance(g, 10000)).toEqual(g); });
   it('修为不足不能突破，满修为后消耗并升层', () => { const g = initialGame(0); expect(breakthrough(g)).toBe(g); const next = breakthrough({ ...g, cultivation: requirement(g) }); expect(next.layer).toBe(2); expect(next.cultivation).toBe(0); });
@@ -11,7 +11,7 @@ describe('修行与资源', () => {
 });
 describe('存档', () => {
   it('JSON 往返保存所有进度', () => { const g = initialGame(); expect(parseSave(JSON.stringify(g))).toEqual(g); });
-  it('读取存档结算离线奖励并保留累计资源', () => { const result = restore(JSON.stringify({ ...initialGame(0), stones: 20 }), 10000); expect(result.seconds).toBe(10); expect(result.stones).toBe(5); expect(result.game.stones).toBe(25); });
+  it('读取存档结算离线奖励并保留累计资源', () => { const result = restore(JSON.stringify({ ...initialGame(0), stones: 20 }), 10000); expect(result.seconds).toBe(10); expect(result.stones).toBeCloseTo(0.2); expect(result.game.stones).toBeCloseTo(20.2); });
   it.each(['null', '{}', '{', JSON.stringify({ ...initialGame(), realm: 99 }), JSON.stringify({ ...initialGame(), stones: -1 }), JSON.stringify({ ...initialGame(), technique: 0 }), JSON.stringify({ ...initialGame(), cultivation: 999 }), JSON.stringify({ ...initialGame(), logs: [12] }), JSON.stringify({ ...initialGame(), updatedAt: Date.now() + 120000 })])('拒绝损坏或非法存档 %s', raw => { expect(() => parseSave(raw)).toThrow(); });
 });
 
